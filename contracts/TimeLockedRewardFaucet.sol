@@ -10,7 +10,7 @@ contract TimeLockedRewardFaucet {
     address constant public MULTISIG_OWNER = 0x0;
     address constant public TEAM_WALLET = 0xA0D8F33Ef9B44DaAE522531DD5E7252962b09207;
 
-    ERC20_Transferable token = ERC20_Transferable(0x7C5A0CE9267ED19B22F8cae653F198e3E8daf098);
+    ERC20_Transferable public token = ERC20_Transferable(0x7C5A0CE9267ED19B22F8cae653F198e3E8daf098);
     uint constant public LOCK_RELASE_TIME = 1499846591 + 90 days; //block.timestamp(4011221) == 1499846591
     uint constant public WITHDRAWAL_END_TIME = LOCK_RELASE_TIME + 30 days;
     uint constant public TOKEN_AMOUNT_TO_DISTRIBUTE = 0x0;
@@ -28,7 +28,7 @@ contract TimeLockedRewardFaucet {
             uint diff = LOCK_RELASE_TIME - now;
             uint dd = diff / 1 days;
             uint hh = diff % 1 days / 1 hours;
-            uint mm = diff % 1 minutes / 1 minutes;
+            uint mm = diff % 1 hours / 1 minutes;
             return [dd,hh,mm];
         } else {
             return [uint(0), uint(0), uint(0)];
@@ -53,7 +53,7 @@ contract TimeLockedRewardFaucet {
             //payout processing
             require(indexOf(team_accounts, msg.sender)>=0);
             token.transfer(msg.sender,  TOKEN_AMOUNT_TO_DISTRIBUTE / SHARES_NUM);
-        } if (state==State.CLOSED) {
+        } else if (state==State.CLOSED) {
             //collect unclaimed token to team wallet
             require(msg.sender == TEAM_WALLET);
             var balance = token.balanceOf(this);
